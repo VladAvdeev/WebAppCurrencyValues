@@ -20,6 +20,8 @@ namespace WebAppCurrencyValues.Services
         public async Task<ValuteModel> GetValuteById(string id)
         {
             HttpClient client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration.GetConnectionString("CurrencyUrl").ToString());
+            client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var response = await client.GetAsync(client.BaseAddress);
 
@@ -29,7 +31,14 @@ namespace WebAppCurrencyValues.Services
 
                 var dailyCurrency = await JsonSerializer.DeserializeAsync<CurrencyModel>(responseStream);
 
-                var currencyByCountry = dailyCurrency.GetType().GetProperties().Select(x => dailyCurrency.ValuteCountry.GetType().GetProperty(x.Name).GetValue(dailyCurrency.ValuteCountry, null) as ValuteModel).FirstOrDefault(x => x.ID == id);
+                var currencyByCountry = dailyCurrency.Valute
+                    .GetType()
+                    .GetProperties()
+                    .Select(property => dailyCurrency.Valute
+                        .GetType()
+                        .GetProperty(property.Name)
+                        .GetValue(dailyCurrency.Valute, null) as ValuteModel)
+                        .FirstOrDefault(x => x.ID == id);
 
                 return currencyByCountry;
             }
@@ -41,6 +50,8 @@ namespace WebAppCurrencyValues.Services
         public async Task<IEnumerable<ValuteModel>> GetValuteModels()
         {
             HttpClient client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration.GetConnectionString("CurrencyUrl").ToString());
+            client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var response = await client.GetAsync(client.BaseAddress);
 
@@ -50,8 +61,14 @@ namespace WebAppCurrencyValues.Services
 
                 var dailyCurrency = await JsonSerializer.DeserializeAsync<CurrencyModel>(responseStream);
 
-                var currencies = dailyCurrency.GetType().GetProperties().
-                    Select(x => dailyCurrency.ValuteCountry.GetType().GetProperty(x.Name).GetValue(dailyCurrency.ValuteCountry, null) as ValuteModel);
+                var currencies = dailyCurrency.Valute
+                    .GetType()
+                    .GetProperties()
+                    .Select(property => 
+                        dailyCurrency.Valute
+                        .GetType()
+                        .GetProperty(property.Name)
+                        .GetValue(dailyCurrency.Valute, null) as ValuteModel);
 
                 return currencies;
             }

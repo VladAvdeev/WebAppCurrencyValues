@@ -7,7 +7,7 @@
         public string CharCode { get; set; }
         public int Nominal { get; set; }
         public string Name { get; set; }
-        public float Value { get; set; }
-        public float Previous { get; set; }
+        public double Value { get; set; }
+        public double Previous { get; set; }
     }
 }
