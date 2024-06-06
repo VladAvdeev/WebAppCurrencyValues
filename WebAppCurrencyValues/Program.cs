@@ -29,4 +29,11 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "Default",
+        pattern: "{controller=Currency}/{action=GetAllCurrencies}");
+});
+
 app.Run();
